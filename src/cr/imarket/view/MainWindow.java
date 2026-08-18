@@ -1,8 +1,9 @@
 package cr.imarket.view;
 import javax.swing.*;
 import cr.imarket.model.Producto;
-import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
+import cr.imarket.controller.ProductoController;
+import java.util.ArrayList;
 
 public class MainWindow {
 
@@ -15,50 +16,54 @@ public class MainWindow {
     private JPanel panelFormulario;
     private JTable tablaProductos;
 
-    private ArrayList<Producto> productos = new ArrayList<>();
 
     private DefaultTableModel modeloTabla;
 
-    public MainWindow(){
+    //objeto controller para conectar Application -> controller -> view
+    private ProductoController controller;
+
+    public MainWindow(ProductoController controller) {
+
+        System.out.println("Entrando al constructor de MainWindow");
+
+
+        // Guardamos la referencia al Controller recibido
+        this.controller = controller;
 
         JFrame frame = new JFrame("iMarket Manager");
 
-        // Definimos las columnas de la tabla
-        String[] columnas = {
-                "Nombre",
-                "Cantidad",
-                "Costo",
-                "Precio",
-                "Ganancia unidad",
-                "Ganancia potencial"
-        };
+        frame.setContentPane(panelPrincipal);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setSize(500, 300);
+        frame.setLocationRelativeTo(null);
 
-// Creamos el modelo vacío
+        String[] columnas = {
+                "Nombre", "Cantidad", "Costo", "Precio", "Ganancia unidad", "Ganancia potencial"};
+
         modeloTabla = new DefaultTableModel(columnas, 0);
 
-// Conectamos el modelo con la JTable visual
         tablaProductos.setModel(modeloTabla);
+
+        frame.setVisible(true);
+
+        // ---------------------------------------------------------
 
         btnAgregar.addActionListener(e -> {
 
-            // Leemos lo que escribió el usuario
+            // La View lee los datos escritos por el usuario
             String nombre = txtNombre.getText();
-
             int cantidad = Integer.parseInt(txtCantidad.getText());
             double costo = Double.parseDouble(txtCosto.getText());
             double precioVenta = Double.parseDouble(txtPrecioVenta.getText());
 
-            // Creamos el producto con esos datos
-            Producto producto = new Producto(
+            Producto producto = controller.agregarProducto(
                     nombre,
                     cantidad,
                     costo,
                     precioVenta
             );
 
-            productos.add(producto);
-
-            // Creamos una fila con los datos del producto
             Object[] fila = {
                     producto.getNombre(),
                     producto.getCantidad(),
@@ -68,25 +73,31 @@ public class MainWindow {
                     producto.calcularGananciaPotencial()
             };
 
-// Agregamos la fila a la tabla
             modeloTabla.addRow(fila);
 
-            // Por ahora mostramos el resultado en consola
-            System.out.println("Producto agregado: " + producto.getNombre());
-            System.out.println("Ganancia por unidad: " + producto.calcularGananciaUnidad());
-            System.out.println("Ganancia potencial: " + producto.calcularGananciaPotencial());
-            System.out.println("Productos registrados: " + productos.size());
+            System.out.println("Producto registrado mediante Controller");
+
         });
 
-
-        frame.setContentPane(panelPrincipal);
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        frame.setSize(500,300);
-
-        frame.setLocationRelativeTo(null);
-
-        frame.setVisible(true);
+        /*
+        Usuario hace clic
+↓
+View detecta evento
+↓
+View lee JTextField
+↓
+View llama:
+controller.agregarProducto(...)
+↓
+Controller crea Producto
+↓
+Controller guarda Producto
+↓
+Controller devuelve Producto
+↓
+View recibe Producto
+↓
+View lo muestra en JTable
+         */
     }
 }
