@@ -7,19 +7,12 @@ public class Application {
 
     public static void main(String[] args) {
 
-
-        System.out.println("Entrando a main");
-
-
         // Creamos el Controller
         ProductoController controller = new ProductoController();
 
 
-        System.out.println("Controller creado");
-
         // Creamos la View y le entregamos el Controller
         new MainWindow(controller);
-        System.out.println("MainWindow creada");
 
     }
 }
